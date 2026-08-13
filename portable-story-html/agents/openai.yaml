@@ -1,0 +1,7 @@
+interface:
+  display_name: "Portable Story HTML"
+  short_description: "Bundle a Storybook story into one offline HTML"
+  default_prompt: "Use $portable-story-html to convert this Storybook story into a single offline HTML file."
+
+policy:
+  allow_implicit_invocation: false

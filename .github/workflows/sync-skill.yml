@@ -1,0 +1,49 @@
+name: Sync skill from shared_skills
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-portable-story-html
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mirror repository
+        uses: actions/checkout@v4
+
+      - name: Check out source repository
+        uses: actions/checkout@v4
+        with:
+          repository: Zhenghangxu/shared_skills
+          ref: main
+          path: source
+
+      - name: Mirror canonical skill files
+        run: |
+          rsync -a --delete \
+            --exclude='.DS_Store' \
+            --exclude='__pycache__/' \
+            --exclude='*.pyc' \
+            source/portable-story-html/ portable-story-html/
+          find source -depth -delete
+
+      - name: Commit synchronized files
+        run: |
+          if git diff --quiet && [ -z "$(git status --porcelain --untracked-files=normal)" ]; then
+            echo "Skill mirror is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add portable-story-html
+          git commit -m "Sync portable-story-html from shared_skills"
+          git push
