@@ -25,6 +25,8 @@ jobs:
           repository: Zhenghangxu/shared_skills
           ref: main
           path: source
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
+          persist-credentials: false
 
       - name: Mirror canonical skill files
         run: |
